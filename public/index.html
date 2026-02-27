@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Brackets - Il Gioco del Tabellone</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div id="app">
+
+    <!-- ═══════ HOME SCREEN ═══════ -->
+    <div id="screen-home" class="screen active">
+      <div class="home-container">
+        <div class="logo">
+          <div class="logo-bracket">[</div>
+          <div class="logo-text">BRACKETS</div>
+          <div class="logo-bracket">]</div>
+        </div>
+        <p class="subtitle">Il gioco del tabellone</p>
+
+        <div class="home-actions">
+          <div class="input-group">
+            <input type="text" id="player-name" placeholder="Il tuo nome" maxlength="20" autocomplete="off">
+          </div>
+
+          <button class="btn btn-primary btn-large" id="btn-create">
+            <span class="btn-icon">+</span> Crea Partita
+          </button>
+
+          <div class="divider"><span>oppure</span></div>
+
+          <div class="join-row">
+            <input type="text" id="room-code-input" placeholder="Codice stanza" maxlength="5" class="code-input" autocomplete="off">
+            <button class="btn btn-secondary" id="btn-join">Entra</button>
+          </div>
+
+          <div class="divider"><span>oppure</span></div>
+
+          <div class="home-bottom-actions">
+            <button class="btn btn-ghost btn-large" id="btn-spectate-home">
+              <span class="btn-icon">&#128065;</span> Entra come Spettatore
+            </button>
+            <button class="btn btn-ghost btn-large" id="btn-load">
+              <span class="btn-icon">&#128190;</span> Carica Partita Salvata
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════ LOAD GAME SCREEN ═══════ -->
+    <div id="screen-load" class="screen">
+      <div class="screen-content">
+        <button class="btn-back" id="btn-back-load">&larr; Indietro</button>
+        <h2>Partite Salvate</h2>
+        <div id="saved-games-list" class="saved-games-list">
+          <p class="muted">Caricamento...</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════ LOBBY ═══════ -->
+    <div id="screen-lobby" class="screen">
+      <div class="screen-content">
+        <div class="room-header">
+          <div class="room-code-display">
+            <span class="label">Codice Stanza</span>
+            <span class="code" id="lobby-room-code">-----</span>
+            <button class="btn-copy" id="btn-copy-code" title="Copia codice">&#128203;</button>
+          </div>
+          <div class="qr-section" id="qr-section">
+            <div id="qr-container"></div>
+            <p class="qr-hint">Scansiona per unirti alla partita</p>
+          </div>
+        </div>
+
+        <div class="lobby-grid">
+          <div class="lobby-settings" id="lobby-settings">
+            <h3>Impostazioni</h3>
+            <div class="input-group">
+              <label for="topic-input">Argomento</label>
+              <input type="text" id="topic-input" placeholder="es. Miglior film Disney" maxlength="100">
+            </div>
+            <div class="input-group">
+              <label>Dimensione Bracket</label>
+              <div class="size-selector">
+                <button class="size-btn active" data-size="16">16</button>
+                <button class="size-btn" data-size="32">32</button>
+                <button class="size-btn" data-size="64">64</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="lobby-players">
+            <h3>Giocatori <span id="player-count" class="badge">0</span></h3>
+            <div id="players-list" class="players-list"></div>
+          </div>
+        </div>
+
+        <div class="lobby-footer" id="lobby-footer-host">
+          <button class="btn btn-primary btn-large" id="btn-start-proposals" disabled>
+            Inizia Proposte
+          </button>
+          <p class="hint" id="lobby-hint">Servono almeno 3 giocatori e un argomento</p>
+        </div>
+        <div class="lobby-footer" id="lobby-footer-player" style="display:none;">
+          <p class="hint">In attesa che l'host avvii la partita...</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════ PROPOSALS ═══════ -->
+    <div id="screen-proposals" class="screen">
+      <div class="screen-content">
+        <div class="phase-header">
+          <h2>Proponi i tuoi candidati</h2>
+          <p class="topic-badge" id="proposals-topic"></p>
+          <p class="hint" id="proposals-hint"></p>
+        </div>
+
+        <div id="proposal-inputs" class="proposal-inputs"></div>
+
+        <div class="progress-bar-container">
+          <div class="progress-bar" id="proposal-progress-bar"></div>
+          <span id="proposal-progress-text">0/0 hanno inviato</span>
+        </div>
+
+        <button class="btn btn-primary btn-large" id="btn-submit-proposals">
+          Invia Proposte
+        </button>
+        <div id="proposals-waiting" class="waiting-message" style="display:none;">
+          <div class="spinner"></div>
+          <p>Proposte inviate! In attesa degli altri giocatori...</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════ REVIEW (duplicates + confirm) ═══════ -->
+    <div id="screen-review" class="screen">
+      <div class="screen-content">
+        <h2>Revisione Candidati</h2>
+
+        <div id="duplicates-section" style="display:none;">
+          <div class="alert alert-warning">
+            <strong>Duplicati trovati!</strong>
+            <p>Alcuni candidati sono stati proposti da più giocatori. Sostituisci i duplicati.</p>
+          </div>
+          <div id="duplicates-list" class="duplicates-list"></div>
+        </div>
+
+        <div class="candidates-grid" id="review-candidates"></div>
+
+        <div id="review-footer-host">
+          <button class="btn btn-primary btn-large" id="btn-start-game">
+            Genera Tabellone e Inizia!
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════ MATCH VIEW ═══════ -->
+    <div id="screen-match" class="screen">
+      <div class="match-layout">
+        <!-- Mini bracket (collapsible) -->
+        <div class="mini-bracket-toggle" id="mini-bracket-toggle">
+          <span>&#9654; Tabellone</span>
+        </div>
+        <div class="mini-bracket-panel" id="mini-bracket-panel">
+          <div class="mini-bracket-scroll">
+            <div id="mini-bracket" class="bracket-container mini"></div>
+          </div>
+        </div>
+
+        <!-- Main match area -->
+        <div class="match-main">
+          <div class="match-header">
+            <span class="round-name" id="match-round-name">Round 1</span>
+            <span class="match-number" id="match-number">Sfida 1/8</span>
+          </div>
+
+          <div class="match-versus">
+            <div class="match-candidate left" id="candidate-left">
+              <div class="candidate-name" id="candidate-left-name">-</div>
+              <div class="candidate-proposer" id="candidate-left-proposer">proposto da</div>
+              <div class="vote-count" id="candidate-left-votes" style="display:none;">0</div>
+              <button class="btn btn-vote" id="btn-vote-left">VOTA</button>
+            </div>
+
+            <div class="vs-badge">VS</div>
+
+            <div class="match-candidate right" id="candidate-right">
+              <div class="candidate-name" id="candidate-right-name">-</div>
+              <div class="candidate-proposer" id="candidate-right-proposer">proposto da</div>
+              <div class="vote-count" id="candidate-right-votes" style="display:none;">0</div>
+              <button class="btn btn-vote" id="btn-vote-right">VOTA</button>
+            </div>
+          </div>
+
+          <div class="match-status" id="match-status">
+            <span id="vote-status-text">Vota il tuo preferito!</span>
+          </div>
+
+          <div class="match-votes-detail" id="match-votes-detail" style="display:none;"></div>
+
+          <!-- Host controls -->
+          <div class="match-controls" id="match-controls" style="display:none;">
+            <button class="btn btn-secondary" id="btn-reveal-votes">Rivela Voti</button>
+            <button class="btn btn-primary" id="btn-confirm-match" style="display:none;">Conferma Risultato</button>
+            <button class="btn btn-primary" id="btn-next-match" style="display:none;">Prossima Sfida &rarr;</button>
+          </div>
+
+          <!-- Tiebreaker -->
+          <div class="tiebreaker-panel" id="tiebreaker-panel" style="display:none;">
+            <div class="alert alert-info">
+              <strong>Pareggio!</strong>
+              <p>Contattate una persona esterna per rompere il pareggio. L'host inserisce la scelta.</p>
+            </div>
+            <div class="tiebreaker-buttons">
+              <button class="btn btn-vote" id="btn-tiebreak-left">-</button>
+              <button class="btn btn-vote" id="btn-tiebreak-right">-</button>
+            </div>
+          </div>
+
+          <!-- Winner announcement -->
+          <div class="winner-announcement" id="winner-announcement" style="display:none;">
+            <div class="winner-label">PASSA IL TURNO</div>
+            <div class="winner-name" id="winner-name">-</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════ ROUND SUMMARY ═══════ -->
+    <div id="screen-round-summary" class="screen">
+      <div class="screen-content centered">
+        <h2 id="round-summary-title">Round Completato!</h2>
+        <div id="full-bracket" class="bracket-container full"></div>
+        <div id="round-summary-footer-host">
+          <button class="btn btn-primary btn-large" id="btn-continue-round">
+            Prossimo Round &rarr;
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════ FINISHED ═══════ -->
+    <div id="screen-finished" class="screen">
+      <div class="screen-content centered">
+        <div class="champion-section">
+          <div class="confetti-container" id="confetti-container"></div>
+          <div class="trophy">&#127942;</div>
+          <h1 class="champion-title">VINCITORE</h1>
+          <div class="champion-name" id="champion-name">-</div>
+          <div class="champion-proposer" id="champion-proposer">proposto da -</div>
+        </div>
+
+        <div id="final-bracket" class="bracket-container full"></div>
+
+        <div class="stats-section">
+          <h2>Statistiche</h2>
+          <div class="stats-grid" id="stats-grid"></div>
+        </div>
+
+        <div class="finished-actions">
+          <button class="btn btn-primary" id="btn-new-game">Nuova Partita</button>
+          <button class="btn btn-ghost" id="btn-save-final">&#128190; Salva Risultato</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════ SPECTATOR VIEW ═══════ -->
+    <!-- spectators see the same screens but without interactive elements -->
+
+    <!-- ═══════ TOAST NOTIFICATIONS ═══════ -->
+    <div id="toast-container" class="toast-container"></div>
+  </div>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

@@ -25,6 +25,17 @@ function showScreen(id) {
   screens.forEach(s => s.classList.remove('active'));
   const screen = $(id);
   if (screen) screen.classList.add('active');
+  updateRoomCodeBadge();
+}
+
+function updateRoomCodeBadge() {
+  const badge = $('room-code-badge');
+  if (state.roomCode) {
+    $('room-code-badge-value').textContent = state.roomCode;
+    badge.style.display = '';
+  } else {
+    badge.style.display = 'none';
+  }
 }
 
 function toast(msg, type = 'info') {
@@ -508,6 +519,7 @@ $('btn-new-game').addEventListener('click', () => {
     myVote: null,
     proposalsSubmitted: false
   };
+  $('room-code-badge').style.display = 'none';
   showScreen('screen-home');
 });
 

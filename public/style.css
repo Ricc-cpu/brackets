@@ -42,6 +42,37 @@ html, body {
 
 #app { height: 100%; position: relative; }
 
+/* ─── Room Code Badge ────────────────────────────────────── */
+.room-code-badge {
+  position: fixed;
+  top: 12px;
+  right: 12px;
+  z-index: 200;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 6px 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: var(--shadow);
+  user-select: all;
+  cursor: default;
+}
+.room-code-badge-label {
+  font-size: 9px;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+.room-code-badge-value {
+  font-size: 16px;
+  font-weight: 900;
+  letter-spacing: 3px;
+  color: var(--accent);
+}
+
 /* ─── Screens ─────────────────────────────────────────── */
 .screen {
   display: none;

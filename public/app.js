@@ -187,7 +187,8 @@ async function generateQRCode() {
   try {
     const res = await fetch('/api/server-info');
     const info = await res.json();
-    if (info.addresses && info.addresses.length > 0) {
+    const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+    if (isLocal && info.addresses && info.addresses.length > 0) {
       joinUrl = `http://${info.addresses[0]}:${info.port}?join=${state.roomCode}`;
     } else {
       joinUrl = `${window.location.origin}?join=${state.roomCode}`;
